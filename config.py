@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from aiogram import Bot
 
 
 DIR_PROJECT = Path(__file__).parent
@@ -22,7 +24,13 @@ FILEPATH_ENV = DIR_PROJECT / '.env'
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=FILEPATH_ENV, env_file_encoding='utf-8')
 
+    CHANEL_ID: str = '-1002109737146'
     BOT_TOKEN: str
+    ANOMALY_VOLUME_COEFFICIENT: int = 5
+    DAYS_LOOK_BACK: int = 90
+    MINUTES_FROM_START: int = 15
+
+    bot: Bot | None = None
 
 
 cfg = Config()
