@@ -1,8 +1,10 @@
+from dataclasses import dataclass
+
 from tinkoff.invest import Instrument
-from pydantic import BaseModel
 
 
-class AnomalyVolumeReport(BaseModel):
+@dataclass
+class AnomalyVolumeReport:
     instrument: Instrument
     volume_avg: int | float
     volume_now: int
@@ -14,7 +16,7 @@ class AnomalyVolumeReport(BaseModel):
         return (
             f'#{self.instrument.ticker}\n'
             f'За первые {self.minutes_from_start} минут объем: {self.volume_now}\n'
-            f'больше в {round(self.volume_now/self.volume_avg, 2)} раза,\n'
+            f'больше в {round(self.volume_now/self.volume_avg, 1)} раза,\n'
             f'чем в среднем: {round(self.volume_avg)} за последние {self.days_look_back} дней'
         )
 
