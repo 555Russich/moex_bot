@@ -25,10 +25,8 @@ class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=FILEPATH_ENV, env_file_encoding='utf-8')
 
     CHANEL_ID: str = '-1002109737146'
+    MY_CHAT_ID: str = '264326421'
     BOT_TOKEN: str
-    ANOMALY_VOLUME_COEFFICIENT: int = 5
-    DAYS_LOOK_BACK: int = 90
-    MINUTES_FROM_START: int = 15
 
     bot: Bot | None = None
 

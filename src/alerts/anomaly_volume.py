@@ -15,7 +15,7 @@ from src.date_utils import DateTimeFactory
 class ParamsAnomalyVolume(BaseModel):
     minutes_from_start: int
     days_look_back: int = 90
-    coefficient: int | float = 7
+    coefficient: int | float = 5
 
 
 class AlertAnomalyVolume:
@@ -43,10 +43,11 @@ class AlertAnomalyVolume:
         for instrument in self._instruments:
             await self._get_anomaly_volume_report_and_send_alert(instrument)
 
-    async def _get_anomaly_volume_report_and_send_alert(self, instrument: Instrument) -> None:
+    async def _get_anomaly_volume_report_and_send_alert(
+            self, instrument: Instrument, chat_id: int = cfg.CHANEL_ID) -> None:
         avr = await self._get_anomaly_volume_report(instrument)
         if avr.is_anomaly_volume(self._p.coefficient):
-            await cfg.bot.send_message(chat_id=cfg.CHANEL_ID, text=avr.as_text)
+            await cfg.bot.send_message(chat_id=chat_id, text=avr.as_text)
 
     async def _get_anomaly_volume_report(self, instrument: Instrument) -> AnomalyVolumeReport:
         to = DateTimeFactory.now()
