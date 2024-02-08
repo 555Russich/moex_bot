@@ -3,8 +3,6 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from my_tinkoff.schemas import Shares
-from my_tinkoff.enums import Board
 
 from config import cfg, FILEPATH_LOGGER
 from src.my_logging import get_logger

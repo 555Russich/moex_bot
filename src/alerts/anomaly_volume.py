@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from tinkoff.invest import Instrument, CandleInterval, InstrumentIdType
+from tinkoff.invest import Instrument, CandleInterval
 from my_tinkoff.csv_candles import CSVCandles
-from my_tinkoff.schemas import Instruments
+from my_tinkoff.schemas import Instruments, Candles
 from apscheduler.job import Job
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pydantic import BaseModel
@@ -29,7 +29,7 @@ class AlertAnomalyVolume:
 
     def append_to_scheduler(self, scheduler: AsyncIOScheduler, hour: int, minute: int) -> Job:
         return scheduler.add_job(
-            func=self._get_all_anomaly_volume_reports,
+            func=self.get_all_anomaly_volume_reports,
             trigger='cron',
             day_of_week='mon-fri',
             hour=hour,
@@ -39,30 +39,37 @@ class AlertAnomalyVolume:
             name=f'{self.__class__.__name__} | {hour=} | {minute=}'
         )
 
-    async def _get_all_anomaly_volume_reports(self):
+    async def get_all_anomaly_volume_reports(self):
         for instrument in self._instruments:
-            await self._get_anomaly_volume_report_and_send_alert(instrument)
+            await self.get_anomaly_volume_report_and_send_alert(instrument)
 
-    async def _get_anomaly_volume_report_and_send_alert(
-            self, instrument: Instrument, chat_id: int = cfg.CHANEL_ID) -> None:
-        avr = await self._get_anomaly_volume_report(instrument)
-        if avr.is_anomaly_volume(self._p.coefficient):
-            await cfg.bot.send_message(chat_id=chat_id, text=avr.as_text)
-
-    async def _get_anomaly_volume_report(self, instrument: Instrument) -> AnomalyVolumeReport:
+    async def get_anomaly_volume_report_and_send_alert(
+            self, instrument: Instrument,
+            chat_id: int = cfg.CHANEL_ID
+    ) -> None:
         to = DateTimeFactory.now()
         from_ = to - timedelta(days=self._p.days_look_back)
-
         candles = await CSVCandles.download_or_read(
             instrument=instrument, interval=CandleInterval.CANDLE_INTERVAL_1_MIN,
             from_=from_, to=to,
         )
         candles = candles.remove_weekend_candles()
+        if not candles or candles[-1].time - candles[0].time < timedelta(days=3):
+            return
+
+        avr = await self._get_anomaly_volume_report(ticker=instrument.ticker, candles=candles)
+        if avr.is_anomaly_volume(self._p.coefficient):
+            await cfg.bot.send_message(chat_id=chat_id, text=avr.as_text)
+
+    async def _get_anomaly_volume_report(self, ticker: str, candles: Candles) -> AnomalyVolumeReport:
 
         first_candles_in_days = []
         day_candles = []
         for c in candles:
-            if day_candles and c.time.date() > day_candles[-1].time.date() or c == candles[-1]:
+            dt_market_opens = DateTimeFactory.set_time_when_stock_market_opens(c.time)
+            if c.time < dt_market_opens:
+                continue
+            elif day_candles and c.time.date() > day_candles[-1].time.date() or c == candles[-1]:
                 first_candles_in_days.append(day_candles)
                 day_candles = [c]
             elif (DateTimeFactory.set_time_when_stock_market_opens(c.time) +
@@ -74,7 +81,7 @@ class AlertAnomalyVolume:
         volume_avg = sum(sum_of_volumes) / len(sum_of_volumes)
 
         return AnomalyVolumeReport(
-            instrument=instrument,
+            ticker=ticker,
             volume_now=volume_now,
             volume_avg=volume_avg,
             minutes_from_start=self._p.minutes_from_start,
