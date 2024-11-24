@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import Command, CommandStart
 from my_tinkoff.schemas import Shares
-from my_tinkoff.enums import Board
+from my_tinkoff.enums import ClassCode
 
 from src.alerts.anomaly_volume import ParamsAnomalyVolume, AlertAnomalyVolume
 from src.telegram.commands import COMMAND_TEST_ANOMALY_VOLUME
@@ -21,7 +21,7 @@ async def handle_start(message: Message) -> None:
 
 @router.message(Command(COMMAND_TEST_ANOMALY_VOLUME.command))
 async def handle_test_anomaly_volume(message: Message) -> None:
-    instruments = await Shares.from_board(Board.TQBR)
+    instruments = await Shares.from_board(ClassCode.TQBR)
     params = ParamsAnomalyVolume(minutes_from_start=5)
     avr = AlertAnomalyVolume(instruments=instruments, params=params)
     for instrument in instruments:

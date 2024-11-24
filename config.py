@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import ClassVar
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from aiogram import Bot
@@ -24,6 +25,7 @@ FILEPATH_ENV = DIR_PROJECT / '.env'
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=FILEPATH_ENV, env_file_encoding='utf-8')
 
+    CURRENCIES: ClassVar = ('USD', 'EUR', 'CNY')
     CHANEL_ID: str = '-1002109737146'
     MY_CHAT_ID: str = '264326421'
     BOT_TOKEN: str

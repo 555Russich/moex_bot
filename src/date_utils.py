@@ -1,7 +1,10 @@
 from datetime import datetime
 from dataclasses import dataclass
+from zoneinfo import ZoneInfo
 
 from my_tinkoff.date_utils import DateTimeFactory as BaseDatetimeFactory
+
+TZ_MOSCOW = ZoneInfo('Europe/Moscow')
 
 
 class DateTimeFactory(BaseDatetimeFactory):

@@ -4,7 +4,7 @@ from datetime import timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from my_tinkoff.date_utils import TZ_UTC
 from my_tinkoff.schemas import Shares
-from my_tinkoff.enums import Board
+from my_tinkoff.enums import ClassCode
 
 from src.date_utils import DateTimeFactory
 
@@ -25,10 +25,12 @@ class Scheduler:
     @classmethod
     async def setup(cls) -> None:
         from src.alerts.anomaly_volume import ParamsAnomalyVolume, AlertAnomalyVolume
+        from src.alerts.cb_cur_rates import AlertCBCurRates
+        from src.alerts.forex_cur_rates import AlertForexCurRates
 
         now = DateTimeFactory.now()
         dt_stocks_open = DateTimeFactory.set_time_when_stock_market_opens(now)
-        instruments_tqbr = await Shares.from_board(Board.TQBR)
+        instruments_tqbr = await Shares.from_board(ClassCode.TQBR)
 
         all_params = (
             ParamsAnomalyVolume(minutes_from_start=5),
@@ -40,3 +42,6 @@ class Scheduler:
             aav = AlertAnomalyVolume(instruments=instruments_tqbr, params=params)
             dt_run = dt_stocks_open + timedelta(minutes=params.minutes_from_start)
             aav.append_to_scheduler(scheduler=cls.instance, hour=dt_run.hour, minute=dt_run.minute)
+
+        AlertCBCurRates().append_to_scheduler(scheduler=cls.instance)
+        AlertForexCurRates().append_to_scheduler(scheduler=cls.instance)
