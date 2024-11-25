@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from pandas import DataFrame
 from tvDatafeed import TvDatafeed, Interval
 
-from src.date_utils import TZ_MOSCOW
+from src.date_utils import DateTimeFactory, TZ_MOSCOW
 
 
 async def get_cb_key_rate(cbr_rate_dt: datetime):
@@ -50,12 +50,13 @@ async def scrap_cb_key_rate(session: ClientSession) -> float:
 
 async def get_cbr_cur_rates(date_: date) -> dict:
     sleep_time = 10
+    today_date = datetime.now(tz=TZ_MOSCOW).date()
 
     async with ClientSession() as session:
         while True:
             date_cb, cur_rates = await scrap_cb_cur_rate(session=session, date_=date_)
 
-            if date_cb == date_:
+            if (date_cb == date_) or (date_ == today_date and date_cb < date_):
                 return cur_rates
 
             logging.info(f'Sleeping for {sleep_time} seconds. Date on cbr.ru: {date_cb.strftime("%d.%m.%Y")}')
