@@ -22,6 +22,10 @@ async def main():
     bot = Bot(token=cfg.BOT_TOKEN, parse_mode=ParseMode.HTML)
     cfg.bot = bot
     await set_commands(bot)
+
+    # from src.alerts.forex_cur_rates import AlertForexCurRates
+    # await AlertForexCurRates().get_forex_cur_rates_and_send_message()
+
     await dp.start_polling(bot)
 
 

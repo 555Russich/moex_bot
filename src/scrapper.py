@@ -89,8 +89,8 @@ async def scrap_cb_cur_rate(session: ClientSession, date_: date) -> [datetime, d
 
 async def get_forex_cur_rates(dt: datetime) -> dict:
     tv = TvDatafeed()
-    dt_from = dt.replace(hour=10)
-    dt_to = dt.replace(hour=15, minute=30)
+    dt_from = dt.replace(hour=10, tzinfo=None)
+    dt_to = dt.replace(hour=15, minute=30, tzinfo=None)
     rates_info = await get_cbr_cur_rates(dt_from.date())
 
     for cur_code in ['USD', 'EUR', 'CNY']:
