@@ -54,7 +54,7 @@ class AlertAnomalyVolume:
             from_=from_, to=to,
         )
         candles = candles.remove_weekend_candles()
-        if not candles or candles[-1].time - candles[0].time < timedelta(days=3):
+        if not candles or candles[-1].dt - candles[0].dt < timedelta(days=3):
             return
 
         avr = await self._get_anomaly_volume_report(ticker=instrument.ticker, candles=candles)
@@ -66,14 +66,14 @@ class AlertAnomalyVolume:
         first_candles_in_days = []
         day_candles = []
         for c in candles:
-            dt_market_opens = DateTimeFactory.set_time_when_stock_market_opens(c.time)
-            if c.time < dt_market_opens:
+            dt_market_opens = DateTimeFactory.set_time_when_stock_market_opens(c.dt)
+            if c.dt < dt_market_opens:
                 continue
-            elif day_candles and c.time.date() > day_candles[-1].time.date() or c == candles[-1]:
+            elif day_candles and c.dt.date() > day_candles[-1].dt.date() or c == candles[-1]:
                 first_candles_in_days.append(day_candles)
                 day_candles = [c]
-            elif (DateTimeFactory.set_time_when_stock_market_opens(c.time) +
-                  timedelta(minutes=self._p.minutes_from_start) > c.time):
+            elif (DateTimeFactory.set_time_when_stock_market_opens(c.dt) +
+                  timedelta(minutes=self._p.minutes_from_start) > c.dt):
                 day_candles.append(c)
 
         sum_of_volumes = [sum([c.volume for c in day_candles]) for day_candles in first_candles_in_days]
