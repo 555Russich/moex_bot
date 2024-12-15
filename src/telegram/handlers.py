@@ -25,5 +25,5 @@ async def handle_test_anomaly_volume(message: Message) -> None:
     params = ParamsAnomalyVolume(minutes_from_start=5)
     avr = AlertAnomalyVolume(instruments=instruments, params=params)
     for instrument in instruments:
-        if instrument.ticker == 'DELI':
+        # if instrument.ticker == 'KAZT':
             await avr.get_anomaly_volume_report_and_send_alert(instrument=instrument, chat_id=message.chat.id)

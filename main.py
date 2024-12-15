@@ -23,8 +23,23 @@ async def main():
     cfg.bot = bot
     await set_commands(bot)
 
-    # from src.alerts.forex_cur_rates import AlertForexCurRates
-    # await AlertForexCurRates().get_forex_cur_rates_and_send_message()
+    # # from src.alerts.forex_cur_rates import AlertForexCurRates
+    # # await AlertForexCurRates().get_forex_cur_rates_and_send_message()
+    # from src.scrapper import get_funding, get_forex_cur_rates, get_cbr_cur_rates
+    # from datetime import datetime, timedelta
+    # # dt = datetime.now() - timedelta(days=2)
+    # # cur_rates = await get_forex_cur_rates(dt=dt)
+    # # await get_funding(date_=dt.date(), cur_rates=cur_rates)
+    #
+    #
+    # dt = datetime.now()
+    # for i in [2, 3, 4, 5, 6, 9, 10, 11, 12, 13]:
+    #     dt = dt.replace(day=i)
+    #     cur_rates = await get_cbr_cur_rates(date_=(dt + timedelta(days=1)).date())
+    #     cur_rates_2 = await get_funding(date_=dt.date(), cur_rates=cur_rates)
+    #     print(dt)
+    #     for cur in ['USD', 'EUR']:
+    #         print(f'{cur=} | {cur_rates_2[cur]['Курс']} | {cur_rates_2[cur]['funding']}')
 
     await dp.start_polling(bot)
 

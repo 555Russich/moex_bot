@@ -1,0 +1,3 @@
+class TvDataError(Exception):
+    pass
+
