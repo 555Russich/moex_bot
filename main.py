@@ -23,13 +23,16 @@ async def main():
     cfg.bot = bot
     await set_commands(bot)
 
-    # from src.alerts.forex_cur_rates import AlertForexCurRates
+    from src.alerts.forex_cur_rates import AlertForexCurRates
+    # from src.alerts.cb_cur_rates import AlertCBCurRates
     # await AlertForexCurRates().get_forex_cur_rates_and_send_message()
+    # await AlertCBCurRates().get_cb_cur_rates_and_send_message()
+
     # from src.scrapper import get_funding, get_forex_cur_rates, get_cbr_cur_rates
     # from datetime import datetime, timedelta
-    # # dt = datetime.now() - timedelta(days=2)
-    # # cur_rates = await get_forex_cur_rates(dt=dt)
-    # # await get_funding(date_=dt.date(), cur_rates=cur_rates)
+    # dt = datetime.now() - timedelta(days=2)
+    # cur_rates = await get_forex_cur_rates(dt=dt)
+    # await get_funding(date_=dt.date(), cur_rates=cur_rates)
     #
     #
     # dt = datetime.now()

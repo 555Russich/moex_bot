@@ -79,6 +79,11 @@ class Scrapper:
 
         return date_cb, cur_rates
 
+    @retry(
+        stop=stop_after_attempt(100),
+        wait=wait_random(0, 2),
+        before_sleep=before_sleep_log(logger, log_level=logging.DEBUG)
+    )
     async def scrap_clearing_rate(self, date_: date, cur: str) -> float:
         date_str = date_.strftime('%Y-%m-%d')
         url = f'https://iss.moex.com/iss/statistics/engines/futures/markets/indicativerates/securities/{cur}/RUB.json?from={date_str}'
@@ -201,8 +206,7 @@ async def get_funding(date_: date, cur_rates: dict):
             else:
                 spot_rate = cur_rates[cur]['rate1']
 
-            last_clearing_price = await scrapper.scrap_clearing_rate(date_=date_, cur=cur)
-            cur_params[cur]['last_clearing_price'] = last_clearing_price
+            last_clearing_price = await scrapper.scrap_clearing_rate(date_=date_-timedelta(days=1), cur=cur)
             cur_rates[cur]['last_clearing_price'] = last_clearing_price
 
             df = tv.get_hist(symbol=f'{cur}RUB.P', exchange='RUS', interval=Interval.in_1_minute, n_bars=86400)
@@ -220,7 +224,3 @@ async def get_funding(date_: date, cur_rates: dict):
             cur_rates[cur]['funding'] = funding
             # print(f'{spot_rate=} | {vwap=} | {d=} | {funding=}')
     return cur_rates
-
-    print(cur_params)
-    # tv = TvDatafeed()
-
