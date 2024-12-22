@@ -118,11 +118,11 @@ async def get_cbr_cur_rates(date_: date) -> dict:
     async with Scrapper() as scrapper:
         while True:
             seconds_from_start = time.time() - start_time
-            if seconds_from_start > 30*60:
+            if seconds_from_start >= 30*60:
                 sleep_time = 1
-            elif seconds_from_start > 20*60:
+            elif seconds_from_start >= 20*60:
                 sleep_time = 2
-            if seconds_from_start > 10 * 60:
+            elif seconds_from_start >= 10 * 60:
                 sleep_time = 5
 
             date_cb, cur_rates = await scrapper.scrap_cb_cur_rate(date_=date_)
