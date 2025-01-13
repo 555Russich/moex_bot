@@ -10,6 +10,7 @@ from tvDatafeed import TvDatafeed, Interval
 from tenacity import (
     retry,
     stop_after_attempt,
+    retry_if_not_exception_type,
     before_sleep_log,
     wait_random
 )
@@ -82,7 +83,9 @@ class Scrapper:
     @retry(
         stop=stop_after_attempt(100),
         wait=wait_random(0, 2),
-        before_sleep=before_sleep_log(logger, log_level=logging.DEBUG)
+        retry=retry_if_not_exception_type(ValueNotFound),
+        before_sleep=before_sleep_log(logger, log_level=logging.DEBUG),
+
     )
     async def scrap_clearing_rate(self, date_: date, cur: str) -> float:
         date_str = date_.strftime('%Y-%m-%d')
