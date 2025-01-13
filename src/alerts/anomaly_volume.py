@@ -59,7 +59,7 @@ class AlertAnomalyVolume:
 
         avr = await self._get_anomaly_volume_report(ticker=instrument.ticker, candles=candles)
         if avr.is_anomaly_volume(self._p.coefficient):
-            await cfg.bot.send_message(chat_id=chat_id, text=avr.as_text)
+            await cfg.bot.send_message(chat_id=chat_id, text=avr.as_text, disable_notification=True)
 
     async def _get_anomaly_volume_report(self, ticker: str, candles: Candles) -> AnomalyVolumeReport:
 
