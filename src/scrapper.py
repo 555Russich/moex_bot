@@ -16,7 +16,7 @@ from tenacity import (
 from aiomoex import ISSClient
 
 from src.date_utils import DateTimeFactory, TZ_MOSCOW
-from src.exceptions import TvDataError
+from src.exceptions import TvDataError, ValueNotFound
 
 
 logger = logging.getLogger()
@@ -93,6 +93,7 @@ class Scrapper:
         for d in data['securities']:
             if date_str == d['tradedate'] and d['clearing'] == 'vk':
                 return d['rate']
+        raise ValueNotFound
 
 
 async def get_cb_key_rate(cbr_rate_dt: datetime):
@@ -189,6 +190,16 @@ def _calculate_forex_cur_rate(df: DataFrame, method: int) -> float:
     return sum(df['avg'] * df['volume']) / sum(df['volume'])
 
 
+async def get_last_clearing_price(date_: date, cur: str) -> float:
+    i_day = 1
+    async with Scrapper() as scrapper:
+        while True:
+            try:
+                return await scrapper.scrap_clearing_rate(date_=date_-timedelta(days=i_day), cur=cur)
+            except ValueNotFound:
+                i_day += 1
+
+
 async def get_funding(date_: date, cur_rates: dict):
     cur_params = {
         'USD': {'K1': 0.001, 'K2': 0.001, 'last_clearing_price': None, 'vwap': None},
@@ -206,7 +217,7 @@ async def get_funding(date_: date, cur_rates: dict):
             else:
                 spot_rate = cur_rates[cur]['rate1']
 
-            last_clearing_price = await scrapper.scrap_clearing_rate(date_=date_-timedelta(days=1), cur=cur)
+            last_clearing_price = await get_last_clearing_price(date_=date_, cur=cur)
             cur_rates[cur]['last_clearing_price'] = last_clearing_price
 
             df = tv.get_hist(symbol=f'{cur}RUB.P', exchange='RUS', interval=Interval.in_1_minute, n_bars=86400)
