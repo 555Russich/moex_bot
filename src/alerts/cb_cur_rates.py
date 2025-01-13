@@ -35,9 +35,9 @@ class AlertCBCurRates:
             d = cr[cur]
             text = (f'{cur}\n'
                     f'Курс: {d['Курс']}\n'
-                    f'Цена предыдущего клиринга: {d['last_clearing_price']}\n'
-                    f'{cur}RUBF VWAP: {round(d['vwap'], 3)}\n'
-                    f'Funding: {round(d['funding'], 5)}\n')
+                    f'Цена предыдущего клиринга: {str(d['last_clearing_price']).replace('.', ',')}\n'
+                    f'{cur}RUBF VWAP: {str(round(d['vwap'], 3)).replace('.', ',')}\n'
+                    f'Funding: {str(round(d['funding'], 5)).replace('.', ',')}\n')
             msg.append(text)
         msg = '\n'.join(msg)
 

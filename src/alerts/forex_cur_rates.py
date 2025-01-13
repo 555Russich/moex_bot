@@ -31,11 +31,12 @@ class AlertForexCurRates:
             d = cr[cur]
             text = (f'{cur}\n'
                     f'Rate1: {round(d['rate1'], 3)} | Rate2: {round(d['rate2'], 3)} | Rate3: {round(d['rate3'], 3)}\n'
-                    f'Цена предыдущего клиринга: {d['last_clearing_price']}\n'
-                    f'{cur}RUBF VWAP: {round(d['vwap'], 3)}\n'
-                    f'Funding: {round(d['funding'], 5)}\n')
+                    f'Цена предыдущего клиринга: {str(d['last_clearing_price']).replace('.', ',')}\n'
+                    f'{cur}RUBF VWAP: {str(round(d['vwap'], 3)).replace('.', ',')}\n'
+                    f'Funding: {str(round(d['funding'], 5)).replace('.', ',')}\n')
             msg.append(text)
         msg = '\n'.join(msg)
 
         text = f'{dt.date().strftime('%d.%m.%Y')}\nПриблизительные Курсы валют и фандинг рассчитанные на основе межбанка\n\n{msg}'
-        await cfg.bot.send_message(chat_id=cfg.CHANEL_ID, text=text)
+        print(text)
+        # await cfg.bot.send_message(chat_id=cfg.CHANEL_ID, text=text)
