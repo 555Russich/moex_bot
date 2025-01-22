@@ -224,11 +224,11 @@ async def get_funding(date_: date, cur_rates: dict):
             cur_rates[cur]['last_clearing_price'] = last_clearing_price
 
             df = tv.get_hist(symbol=f'{cur}RUB.P', exchange='RUS', interval=Interval.in_1_minute, n_bars=86400)
-            df = df.loc[dt_from:dt_to]
-            df['cum_vol'] = df['volume'].cumsum()
-            df['cum_vol_price'] = (df['volume'] * (df['high'] + df['low'] + df['close'])/3).cumsum()
-            df['vwap'] = df['cum_vol_price'] / df['cum_vol']
-            vwap = float(df['vwap'].iloc[-1])
+            df_2 = df.loc[dt_from:dt_to]
+            df_2['cum_vol'] = df_2['volume'].cumsum()
+            df_2['cum_vol_price'] = (df_2['volume'] * (df_2['high'] + df_2['low'] + df_2['close'])/3).cumsum()
+            df_2['vwap'] = df_2['cum_vol_price'] / df_2['cum_vol']
+            vwap = float(df_2['vwap'].iloc[-1])
             cur_rates[cur]['vwap'] = vwap
 
             l1 = last_clearing_price * cur_params[cur]['K1']
